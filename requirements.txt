@@ -1,0 +1,3 @@
+streamlit>=1.24.0
+agno>=0.1.0
+lancedb>=0.3.0 
