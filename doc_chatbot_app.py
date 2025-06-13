@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 
 st.set_page_config(
     page_title="DocBot 💬",
@@ -7,9 +6,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+import os
 from agno.agent import Agent
 from agno.models.google import Gemini
-from agno.tools.yfinance import YFinanceTools
 from agno.embedder.google import GeminiEmbedder
 from agno.knowledge.url import UrlKnowledge
 from agno.storage.sqlite import SqliteStorage
@@ -123,28 +122,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-import streamlit as st
-import os
-
-st.set_page_config(
-    page_title="DocBot 💬",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-from agno.agent import Agent
-from agno.models.google import Gemini
-from agno.embedder.google import GeminiEmbedder
-from agno.knowledge.url import UrlKnowledge
-from agno.storage.sqlite import SqliteStorage
-from agno.vectordb.lancedb import LanceDb, SearchType
-import re
-
-# Custom CSS for better styling
-st.markdown("""
-// ... existing CSS ...
-""", unsafe_allow_html=True)
-
 def strip_markdown(text):
     text = re.sub(r"```(?:\w+)?", "", text)
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
@@ -255,3 +232,4 @@ if st.session_state.agent:
             
             # Clear the input using session state
             st.session_state.user_input = ""
+
