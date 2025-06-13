@@ -5,3 +5,4 @@ google-genai>=0.1.0
 yfinance>=0.2.36
 sqlalchemy>=2.0.0
 tantivy>=0.20.0
+pylance>=0.1.0
