@@ -3,3 +3,4 @@ agno>=0.1.0
 lancedb>=0.3.0
 google-genai>=0.1.0
 yfinance>=0.2.36
+sqlalchemy>=2.0.0
