@@ -123,6 +123,28 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+import streamlit as st
+import os
+
+st.set_page_config(
+    page_title="DocBot 💬",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+from agno.agent import Agent
+from agno.models.google import Gemini
+from agno.embedder.google import GeminiEmbedder
+from agno.knowledge.url import UrlKnowledge
+from agno.storage.sqlite import SqliteStorage
+from agno.vectordb.lancedb import LanceDb, SearchType
+import re
+
+# Custom CSS for better styling
+st.markdown("""
+// ... existing CSS ...
+""", unsafe_allow_html=True)
+
 def strip_markdown(text):
     text = re.sub(r"```(?:\w+)?", "", text)
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
@@ -134,6 +156,12 @@ api_key = os.getenv("GOOGLE_API_KEY")
 if not api_key:
     st.error("Please set the GOOGLE_API_KEY environment variable")
     st.stop()
+
+# Initialize session state
+if "agent" not in st.session_state:
+    st.session_state.agent = None
+    st.session_state.history = []
+    st.session_state.user_input = ""
 
 # Header
 st.markdown("""
@@ -149,10 +177,6 @@ user_url = st.text_input(
     placeholder="https://example.com/docs",
     help="Paste the URL of the documentation you want to chat with"
 )
-
-if "agent" not in st.session_state:
-    st.session_state.agent = None
-    st.session_state.history = []
 
 # Load documentation button
 if st.button("🔄 Load & Index Documentation", use_container_width=True) and user_url:
@@ -207,7 +231,7 @@ if st.session_state.agent:
     # Input area
     col1, col2 = st.columns([4, 1])
     with col1:
-        user_input = st.text_input("❓ Ask a question", key="user_question", label_visibility="collapsed")
+        user_input = st.text_input("❓ Ask a question", key="user_input", label_visibility="collapsed")
     with col2:
         send_button = st.button("💬 Send", use_container_width=True)
 
@@ -229,6 +253,5 @@ if st.session_state.agent:
             </div>
             """, unsafe_allow_html=True)
             
-            # Clear the input
-            st.session_state.user_question = ""
-
+            # Clear the input using session state
+            st.session_state.user_input = ""
