@@ -138,7 +138,7 @@ if not api_key:
 if "agent" not in st.session_state:
     st.session_state.agent = None
     st.session_state.history = []
-    st.session_state.user_input = ""
+    st.session_state.messages = []
 
 # Header
 st.markdown("""
@@ -195,41 +195,27 @@ if st.button("🔄 Load & Index Documentation", use_container_width=True) and us
 # Chat interface
 if st.session_state.agent:
     # Display chat history
-    for q, a in st.session_state.history:
-        st.markdown(f"""
-        <div class="chat-message user">
-            <div class="message"><strong>You:</strong> {q}</div>
-        </div>
-        <div class="chat-message bot">
-            <div class="message"><strong>Bot:</strong> {a}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    # Input area
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        user_input = st.text_input("❓ Ask a question", key="user_input", label_visibility="collapsed")
-    with col2:
-        send_button = st.button("💬 Send", use_container_width=True)
-
-    if (send_button or user_input) and user_input:
-        with st.spinner("Thinking..."):
-            answer = st.session_state.agent.run(user_input)
-            response_text = answer.content if hasattr(answer, "content") else str(answer)
-            cleaned_response = strip_markdown(response_text)
-
-            st.session_state.history.append((user_input, cleaned_response))
-            
-            # Display new messages
-            st.markdown(f"""
-            <div class="chat-message user">
-                <div class="message"><strong>You:</strong> {user_input}</div>
-            </div>
-            <div class="chat-message bot">
-                <div class="message"><strong>Bot:</strong> {cleaned_response}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Clear the input using session state
-            st.session_state.user_input = ""
+    # Chat input
+    if prompt := st.chat_input("Ask a question"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        # Get bot response
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                answer = st.session_state.agent.run(prompt)
+                response_text = answer.content if hasattr(answer, "content") else str(answer)
+                cleaned_response = strip_markdown(response_text)
+                
+                # Add assistant response to chat history
+                st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+                st.markdown(cleaned_response)
 
